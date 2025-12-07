@@ -1,36 +1,42 @@
 import os
 import threading
 import uvicorn
-from fastapi import FastAPI
+import discord
 from discord.ext import commands
+from bot import bot  
+from fastapi import FastAPI
 
+# ---------------------
+# FastAPI setup
+# ---------------------
 app = FastAPI()
 
 @app.get("/")
-def home():
-    return {"status": "running"}
+async def root():
+    return {"status": "Bot is running!"}
 
 def run_api():
-    port = int(os.environ.get("PORT", 10000))
-    uvicorn.run("main:app", host="0.0.0.0", port=port)
+    port = int(os.environ.get("PORT", 10000))  # Render provides PORT env
+    uvicorn.run(app, host="0.0.0.0", port=port)
 
-intents = commands.Intents.default()
-intents.message_content = True
-intents.members = True  
-bot = commands.Bot(command_prefix="!", intents=intents)
+# ---------------------
+# Discord bot setup
+# ---------------------
+intents = discord.Intents.default()
+intents.message_content = True  # needed to read messages
+intents.members = True  # needed if you access guild members
+bot = bot  # use your existing bot object from bot.py
+bot.intents = intents
 
-@bot.event
-async def on_ready():
-    print(f"Logged in as {bot.user}")
-
-@bot.command()
-async def ping(ctx):
-    await ctx.send("Pong!")
-
-def run_bot():
-    TOKEN = os.environ["DISCORD_TOKEN"]
-    bot.run(TOKEN)
-
+# ---------------------
+# Run both API and bot
+# ---------------------
 if __name__ == "__main__":
+    # Start FastAPI in a separate thread
     threading.Thread(target=run_api, daemon=True).start()
-    run_bot()
+
+    # Run Discord bot
+    token = os.environ.get("DISCORD_TOKEN")
+    if not token:
+        raise ValueError("DISCORD_TOKEN environment variable not set!")
+    bot.run(token)
