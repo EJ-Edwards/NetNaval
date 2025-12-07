@@ -1,41 +1,37 @@
 import os
 import threading
-from fastapi import FastAPI
-import uvicorn
+import discord
 from discord.ext import commands
+import uvicorn
 
-# ---------------------------
-# Discord Bot Setup
-# ---------------------------
-intents = commands.Intents.default()
-intents.message_content = True  # Required for reading message content
+# --- Discord Bot Setup ---
+intents = discord.Intents.default()
+intents.message_content = True  # Needed to read messages
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-TOKEN = os.environ.get("DISCORD_TOKEN")  # Make sure this is set in Render
+# Example bot event (you can remove if you already have handlers in bot.py)
+@bot.event
+async def on_ready():
+    print(f"Logged in as {bot.user}")
 
-# Example bot command
-@bot.command()
-async def ping(ctx):
-    await ctx.send("Pong!")
+# --- FastAPI Setup ---
+from fastapi import FastAPI
 
-# ---------------------------
-# FastAPI Setup
-# ---------------------------
 app = FastAPI()
 
 @app.get("/")
-def read_root():
-    return {"status": "Bot is running!"}
+async def root():
+    return {"status": "ok"}
 
 def run_api():
-    port = int(os.environ.get("PORT", 10000))  # Render sets this automatically
+    # Render provides the PORT environment variable
+    port = int(os.environ.get("PORT", 10000))
     uvicorn.run(app, host="0.0.0.0", port=port)
 
-# ---------------------------
-# Run both
-# ---------------------------
+# --- Run both Discord bot and FastAPI ---
 if __name__ == "__main__":
     # Start FastAPI in a separate thread
     threading.Thread(target=run_api, daemon=True).start()
-    # Start Discord bot (blocking call)
-    bot.run(TOKEN)
+    
+    # Run the Discord bot
+    bot.run(os.environ["DISCORD_TOKEN"])
