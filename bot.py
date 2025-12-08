@@ -1,10 +1,5 @@
-import os
 import discord
 from discord.ext import commands
-
-TOKEN = os.environ.get("DISCORD_TOKEN")
-if TOKEN is None:
-    raise ValueError("No DISCORD_TOKEN found in environment variables")
 
 intents = discord.Intents.default()
 intents.message_content = True
@@ -16,6 +11,10 @@ board1 = ""
 board2 = ""
 boardtoshow1 = ""
 boardtoshow2 = ""
+
+@bot.event
+async def on_ready():
+    print(f"✅ Logged in as {bot.user}")
 
 async def render(ctx, board):
     numbers = ["1️⃣","2️⃣","3️⃣","4️⃣","5️⃣","6️⃣","7️⃣","8️⃣","9️⃣","🔟"]
@@ -48,5 +47,3 @@ async def start(ctx):
     else:
         Playing = True
         await ctx.send("Starting a new game of Battleships!")
-
-bot.run(TOKEN)
