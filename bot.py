@@ -2,16 +2,20 @@ import discord
 from discord.ext import commands
 import random
 
+# ---------- Discord Setup ----------
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
+# ---------- Game State ----------
 Playing = False
 board_player = []
 board_bot = []
+board_radar = []
 ships_player = []
 ships_bot = []
 
+# ---------- Helpers ----------
 def create_board():
     return [["~" for _ in range(10)] for _ in range(10)]
 
@@ -42,10 +46,12 @@ async def render(ctx, board, hide_ships=False):
         display += "\n"
     await ctx.send(display)
 
+# ---------- Events ----------
 @bot.event
 async def on_ready():
     print(f"✅ Logged in as {bot.user}")
 
+# ---------- Commands ----------
 @bot.command()
 async def credits(ctx):
     await ctx.send(
@@ -57,7 +63,7 @@ async def credits(ctx):
 
 @bot.command()
 async def start(ctx):
-    global Playing, board_player, board_bot, ships_player, ships_bot
+    global Playing, board_player, board_bot, board_radar, ships_player, ships_bot
 
     if Playing:
         await ctx.send("❗ A game is already in progress.")
@@ -66,6 +72,7 @@ async def start(ctx):
     Playing = True
     board_player = create_board()
     board_bot = create_board()
+    board_radar = create_board()
     ships_player = []
     ships_bot = []
 
@@ -101,12 +108,12 @@ async def place(ctx, *positions):
         board_player[row][col] = "S"
         ships_player.append((row, col))
 
-    await ctx.send("✅ Ships placed! Your board:")
+    await ctx.send("✅ Ships placed! **Your board:**")
     await render(ctx, board_player)
 
 @bot.command()
 async def fire(ctx, position):
-    global Playing, ships_bot, ships_player
+    global Playing, ships_bot
 
     if not Playing:
         await ctx.send("Start a game with `!start`.")
@@ -120,13 +127,21 @@ async def fire(ctx, position):
         await ctx.send("❌ Invalid position. Example: `!fire B7`")
         return
 
+    if board_radar[row][col] in ["X", "O"]:
+        await ctx.send("❗ You already fired there.")
+        return
+
     if (row, col) in ships_bot:
+        board_radar[row][col] = "X"
         board_bot[row][col] = "X"
         ships_bot.remove((row, col))
         await ctx.send("💥 **Hit!**")
     else:
-        board_bot[row][col] = "O"
+        board_radar[row][col] = "O"
         await ctx.send("🌊 **Miss!**")
+
+    await ctx.send("🎯 **Radar Board**")
+    await render(ctx, board_radar, hide_ships=True)
 
     if not ships_bot:
         await ctx.send("🏆 **You sank all enemy ships — YOU WIN!**")
@@ -151,6 +166,9 @@ async def bot_turn(ctx):
     else:
         board_player[r][c] = "O"
         await ctx.send("🤖 Bot missed.")
+
+    await ctx.send("🛡️ **Your Board**")
+    await render(ctx, board_player)
 
     if not ships_player:
         await ctx.send("💀 **All your ships were sunk — YOU LOSE.**")
