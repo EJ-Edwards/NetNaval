@@ -2,12 +2,10 @@ import discord
 from discord.ext import commands
 import random
 
-# ---------- Discord Setup ----------
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
 
-# ---------- Game State ----------
 Playing = False
 board_player = []
 board_bot = []
@@ -15,7 +13,6 @@ board_radar = []
 ships_player = []
 ships_bot = []
 
-# ---------- Helpers ----------
 def create_board():
     return [["~" for _ in range(10)] for _ in range(10)]
 
@@ -46,12 +43,10 @@ async def render(ctx, board, hide_ships=False):
         display += "\n"
     await ctx.send(display)
 
-# ---------- Events ----------
 @bot.event
 async def on_ready():
     print(f"✅ Logged in as {bot.user}")
 
-# ---------- Commands ----------
 @bot.command()
 async def credits(ctx):
     await ctx.send(
