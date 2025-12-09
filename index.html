@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Discord Battleships</title>
+    <link rel="stylesheet" href="styles.css">
+    <style>
+        body {
+            font-family: 'Roboto', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f4f8;
+            color: #333;
+        }
+        header {
+            background-color: #1e40af;
+            color: white;
+            padding: 2rem;
+            text-align: center;
+        }
+        main {
+            max-width: 800px;
+            margin: 2rem auto;
+            padding: 1rem;
+        }
+        h1, h2 {
+            margin-top: 1.5rem;
+        }
+        section {
+            margin-bottom: 2rem;
+        }
+        code {
+            background-color: #e5e7eb;
+            padding: 0.2rem 0.4rem;
+            border-radius: 4px;
+        }
+        ul {
+            margin-left: 1.5rem;
+        }
+        footer {
+            text-align: center;
+            padding: 1rem;
+            background-color: #1e40af;
+            color: white;
+            margin-top: 2rem;
+        }
+    </style>
+</head>
+<body>
+    <header>
+        <h1>NetNaval</h1>
+        <p>Battleship Game on Discord</p>
+    </header>
+
+    <main>
+        <section id="overview">
+            <h2>Overview</h2>
+            <p>Play Battleships directly in Discord! The bot renders a 10x10 grid using emojis for easy visualization.</p>
+        </section>
+
+        <section id="commands">
+            <h2>Commands</h2>
+            <ul>
+                <li><code>!start</code> - Start a new game</li>
+                <li><code>!place A1 B2 C3</code> - Place your ships (3 ships per game)</li>
+                <li><code>!shoot B3</code> - Fire at a coordinate</li>
+            </ul>
+            <p>Columns: <strong>1–10</strong> | Rows: <strong>A–J</strong></p>
+        </section>
+
+        <section id="board-symbols">
+            <h2>Board Symbols</h2>
+            <ul>
+                <li>🟦 - Water</li>
+                <li>🚢 - Your ship</li>
+                <li>💥 - Hit</li>
+                <li>⚪ - Miss</li>
+            </ul>
+            <p>The top row shows <strong>columns 1–10</strong>, and the left column shows <strong>rows A–J</strong>.</p>
+        </section>
+
+        <section id="winning">
+            <h2>Winning Conditions</h2>
+            <p>Sink all enemy ships to win the game!</p>
+        </section>
+
+        <section id="notes">
+            <h2>Tips</h2>
+            <ul>
+                <li>Use a mix of positions for strategic placement.</li>
+                <li>Remember the row/column order: <strong>A–J</strong> for rows, <strong>1–10</strong> for columns.</li>
+                <li>Keep track of your shots to improve accuracy!</li>
+            </ul>
+        </section>
+    </main>
+
+    <footer>
+        <p>&copy; 2025 Your Name</p>
+    </footer>
+</body>
+</html>
