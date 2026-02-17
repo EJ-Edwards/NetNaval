@@ -2,10 +2,10 @@ import discord
 from discord.ext import commands
 from rooms import Room
 import random
+import aiohttp
 
-# ----------------------------
 # Bot setup
-# ----------------------------
+
 intents = discord.Intents.default()
 intents.message_content = True
 bot = commands.Bot(command_prefix="!", intents=intents)
@@ -18,9 +18,7 @@ board_radar = []
 ships_player = []
 ships_bot = []
 
-# ----------------------------
 # Helper functions
-# ----------------------------
 def create_board():
     return [["~"]*10 for _ in range(10)]
 
@@ -49,16 +47,12 @@ async def render(ctx, board, hide_ships=False):
         display += "\n"
     await ctx.send(display)
 
-# ----------------------------
 # Events
-# ----------------------------
 @bot.event
 async def on_ready():
     print(f"✅ Logged in as {bot.user}")
 
-# ----------------------------
 # Commands
-# ----------------------------
 @bot.command()
 async def credits(ctx):
     await ctx.send(
@@ -68,9 +62,7 @@ async def credits(ctx):
         "Thanks for playing!"
     )
 
-# ----------------------------
 # Single-player commands
-# ----------------------------
 @bot.command()
 async def start(ctx):
     global Playing, board_player, board_bot, board_radar, ships_player, ships_bot
@@ -105,9 +97,7 @@ async def stop(ctx):
         return
     await ctx.send("❌ No game or room to stop.")
 
-# ----------------------------
 # Place ships
-# ----------------------------
 @bot.command()
 async def place(ctx, *positions):
     room = next((r for r in Room.rooms.values() if ctx.author.id in r.players), None)
@@ -157,9 +147,7 @@ async def place(ctx, *positions):
     await ctx.send("✅ Ships placed! **Your board:**")
     await render(ctx, board_player)
 
-# ----------------------------
 # Fire
-# ----------------------------
 @bot.command()
 async def fire(ctx, position):
     alphabet = "ABCDEFGHIJ"
@@ -231,9 +219,7 @@ async def fire(ctx, position):
         return
     await bot_turn(ctx)
 
-# ----------------------------
-# Single-player bot turn
-# ----------------------------
+
 async def bot_turn(ctx):
     global board_player, ships_player, Playing
     while True:
@@ -253,9 +239,7 @@ async def bot_turn(ctx):
         await ctx.send("💀 **All your ships were sunk — YOU LOSE.**")
         Playing = False
 
-# ----------------------------
-# Multiplayer room commands
-# ----------------------------
+
 @bot.command()
 async def create(ctx):
     for room in Room.rooms.values():
@@ -275,4 +259,18 @@ async def join(ctx, pin):
     if not success:
         await ctx.send("❌ Room is full.")
         return
-    await ctx.send(f"✅ Jo
+    await ctx.send(f"✅ Joined room {pin}! Waiting for host to start the game.")
+
+@bot.command()
+async def ping(ctx):
+    """Wake up the API server (useful for Render or similar)."""
+    api_url = "https://netnaval.onrender.com"  
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(api_url, timeout=10) as resp:
+                if resp.status == 200:
+                    await ctx.send("✅ API is awake and ready!")
+                else:
+                    await ctx.send(f"⚠️ API responded with status {resp.status}.")
+    except Exception as e:
+        await ctx.send(f"❌ Could not reach the API: {e}")

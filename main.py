@@ -2,7 +2,7 @@ import os
 import asyncio
 from fastapi import FastAPI
 import uvicorn
-from bot import bot   # ✅ IMPORT THE BOT
+from bot import bot   
 
 app = FastAPI()
 
