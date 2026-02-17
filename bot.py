@@ -263,7 +263,6 @@ async def join(ctx, pin):
 
 @bot.command()
 async def ping(ctx):
-    """Wake up the API server (useful for Render or similar)."""
     api_url = "https://netnaval.onrender.com"  
     try:
         async with aiohttp.ClientSession() as session:
